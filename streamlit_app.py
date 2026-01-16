@@ -12,20 +12,20 @@ load_dotenv()
 
 # Configuration
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-OUTPUT_AUDIO_PATH = "temp_docs/doctor_response.mp3"
-PATIENT_AUDIO_PATH = "temp_docs/patient_audio.wav"
-PATIENT_IMAGE_PATH = "temp_docs/patient_image.png"
+OUTPUT_AUDIO_PATH = os.getenv("OUTPUT_AUDIO_PATH")
+PATIENT_AUDIO_PATH = os.getenv("PATIENT_AUDIO_PATH")
+PATIENT_IMAGE_PATH = os.getenv("PATIENT_IMAGE_PATH")
 
 # Ensure output directory exists
 os.makedirs("temp_docs", exist_ok=True)
 
-# Doctor type prompts
+# Doctor type prompts - Updated for flexible input
 DOCTOR_PROMPTS = {
     "allopathy": {
         "name": "Allopathic Doctor (Modern Medicine)",
         "icon": "👨‍⚕️",
         "specialty": "Modern Medicine",
-        "prompt": """You have to act as an experienced Allopathic (Modern Medicine) Doctor. 
+        "prompt_with_image": """You have to act as an experienced Allopathic (Modern Medicine) Doctor. 
             You follow evidence-based medicine and may suggest conventional treatments, medications, and diagnostic tests.
             What's in this image? Do you find anything wrong with it medically? 
             If you make a differential diagnosis, suggest some remedies including:
@@ -37,13 +37,30 @@ DOCTOR_PROMPTS = {
             Don't say 'In the image I see' but say 'With what I see, I think you have ....'
             Don't respond as an AI model in markdown, your answer should mimic that of an actual doctor.
             Keep your answer concise (max 2-3 sentences). No preamble, start your answer right away.
-            Always end with a positive and reassuring note."""
+            Always end with a positive and reassuring note.
+            
+            Patient's described symptoms: """,
+        "prompt_text_only": """You have to act as an experienced Allopathic (Modern Medicine) Doctor. 
+            You follow evidence-based medicine and may suggest conventional treatments, medications, and diagnostic tests.
+            Based on the patient's described symptoms, provide your medical assessment including:
+            - Possible conditions based on symptoms
+            - Over-the-counter or prescription medications if needed
+            - Lifestyle modifications
+            - When to seek emergency care
+            Do not add any numbers or special characters in your response. 
+            Your response should be in one long paragraph. Answer as if you are talking to a real patient.
+            Start with 'Based on your symptoms, I think you might have ....'
+            Don't respond as an AI model in markdown, your answer should mimic that of an actual doctor.
+            Keep your answer concise (max 2-3 sentences). No preamble, start your answer right away.
+            Always end with a positive and reassuring note.
+            
+            Patient's described symptoms: """
     },
     "homeopathy": {
         "name": "Homeopathic Doctor",
         "icon": "🌿",
         "specialty": "Homeopathy",
-        "prompt": """You have to act as an experienced Homeopathic Doctor following the principles of Samuel Hahnemann.
+        "prompt_with_image": """You have to act as an experienced Homeopathic Doctor following the principles of Samuel Hahnemann.
             You believe in 'like cures like' and use highly diluted natural substances for treatment.
             What's in this image? Do you find anything wrong with it from a homeopathic perspective?
             If you identify any condition, suggest some remedies including:
@@ -54,14 +71,30 @@ DOCTOR_PROMPTS = {
             Your response should be in one long paragraph. Answer as if you are talking to a real patient.
             Don't say 'In the image I see' but say 'With what I see, based on homeopathic principles, I think you have ....'
             Don't respond as an AI model in markdown, your answer should mimic that of an actual homeopathic practitioner.
-            Keep your answer concise (max 3-4 sentences). No preamble, start your answer right away.
-            Always end with a positive and holistic healing note."""
+            Keep your answer concise (max 2-3 sentences). No preamble, start your answer right away.
+            Always end with a positive and holistic healing note.
+            
+            Patient's described symptoms: """,
+        "prompt_text_only": """You have to act as an experienced Homeopathic Doctor following the principles of Samuel Hahnemann.
+            You believe in 'like cures like' and use highly diluted natural substances for treatment.
+            Based on the patient's described symptoms, provide your homeopathic assessment including:
+            - Homeopathic medicines with their potency (like Arnica 30C, Belladonna 200C, etc.)
+            - Constitutional remedies based on symptoms
+            - Dietary and lifestyle recommendations from homeopathic perspective
+            Do not add any numbers or special characters in your response.
+            Your response should be in one long paragraph. Answer as if you are talking to a real patient.
+            Start with 'Based on your symptoms, from a homeopathic perspective, I believe you have ....'
+            Don't respond as an AI model in markdown, your answer should mimic that of an actual homeopathic practitioner.
+            Keep your answer concise (max 2-3 sentences). No preamble, start your answer right away.
+            Always end with a positive and holistic healing note.
+            
+            Patient's described symptoms: """
     },
     "ayurveda": {
         "name": "Ayurvedic Doctor (Vaidya)",
         "icon": "🪷",
         "specialty": "Ayurveda",
-        "prompt": """You have to act as an experienced Ayurvedic Doctor (Vaidya) following ancient Indian medical wisdom.
+        "prompt_with_image": """You have to act as an experienced Ayurvedic Doctor (Vaidya) following ancient Indian medical wisdom.
             You analyze conditions based on the three doshas - Vata, Pitta, and Kapha.
             What's in this image? Do you find any imbalance or condition from an Ayurvedic perspective?
             If you identify any dosha imbalance or condition, suggest remedies including:
@@ -74,8 +107,27 @@ DOCTOR_PROMPTS = {
             Your response should be in one long paragraph. Answer as if you are talking to a real patient.
             Don't say 'In the image I see' but say 'With what I see, according to Ayurvedic principles, I believe there is ....'
             Don't respond as an AI model in markdown, your answer should mimic that of an actual Ayurvedic Vaidya.
-            Keep your answer concise (max 3-4 sentences). No preamble, start your answer right away.
-            Always end with a positive note about natural healing and balance."""
+            Keep your answer concise (max 2-3 sentences). No preamble, start your answer right away.
+            Always end with a positive note about natural healing and balance.
+            
+            Patient's described symptoms: """,
+        "prompt_text_only": """You have to act as an experienced Ayurvedic Doctor (Vaidya) following ancient Indian medical wisdom.
+            You analyze conditions based on the three doshas - Vata, Pitta, and Kapha.
+            Based on the patient's described symptoms, provide your Ayurvedic assessment including:
+            - Possible dosha imbalance (Vata, Pitta, or Kapha)
+            - Ayurvedic herbs and formulations (like Triphala, Ashwagandha, Turmeric, etc.)
+            - Panchakarma or detox therapies if needed
+            - Dietary recommendations based on dosha balance (what to eat and avoid)
+            - Yoga asanas and pranayama for the condition
+            - Daily routine (Dinacharya) modifications
+            Do not add any numbers or special characters in your response.
+            Your response should be in one long paragraph. Answer as if you are talking to a real patient.
+            Start with 'Based on your symptoms, according to Ayurvedic principles, I believe there is ....'
+            Don't respond as an AI model in markdown, your answer should mimic that of an actual Ayurvedic Vaidya.
+            Keep your answer concise (max 2-3 sentences). No preamble, start your answer right away.
+            Always end with a positive note about natural healing and balance.
+            
+            Patient's described symptoms: """
     }
 }
 
@@ -148,6 +200,15 @@ st.markdown("""
         margin: 0;
     }
     
+    /* Input mode tabs */
+    .input-mode-container {
+        background: white;
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
     /* Doctor selection cards */
     .doctor-card {
         background: white;
@@ -210,6 +271,11 @@ st.markdown("""
     .status-info {
         background: #dbeafe;
         color: #1e40af;
+    }
+    
+    .status-optional {
+        background: #f3f4f6;
+        color: #6b7280;
     }
     
     /* Result sections */
@@ -287,6 +353,20 @@ st.markdown("""
         background: #f8fafc;
     }
     
+    /* Text area styling */
+    .stTextArea textarea {
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        padding: 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .stTextArea textarea:focus {
+        border-color: #1e3a5f;
+        box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+    }
+    
     /* Audio recorder container */
     .audio-recorder-container {
         display: flex;
@@ -306,6 +386,22 @@ st.markdown("""
         margin-top: 1rem;
         font-size: 0.875rem;
         color: #92400e;
+    }
+    
+    /* Input summary box */
+    .input-summary {
+        background: #f0f7ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .input-summary-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0;
     }
     
     /* Footer styling */
@@ -329,30 +425,25 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* Radio button styling for doctor selection */
-    .stRadio > div {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
+    /* Tab styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
     }
     
-    .stRadio > div > label {
+    .stTabs [data-baseweb="tab"] {
         background: white;
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
         border: 2px solid #e2e8f0;
-        cursor: pointer;
-        transition: all 0.3s ease;
     }
     
-    .stRadio > div > label:hover {
+    .stTabs [data-baseweb="tab"]:hover {
         border-color: #1e3a5f;
-        transform: translateY(-2px);
     }
     
-    .stRadio > div > label[data-checked="true"] {
-        border-color: #1e3a5f;
+    .stTabs [aria-selected="true"] {
         background: #f0f7ff;
+        border-color: #1e3a5f;
     }
     
     /* Responsive adjustments */
@@ -387,17 +478,29 @@ if "image_saved" not in st.session_state:
     st.session_state.image_saved = False
 if "selected_doctor" not in st.session_state:
     st.session_state.selected_doctor = "allopathy"
+if "text_symptoms" not in st.session_state:
+    st.session_state.text_symptoms = ""
+if "text_saved" not in st.session_state:
+    st.session_state.text_saved = False
 
 # Instructions
 with st.expander("ℹ️ How to use this application", expanded=False):
     st.markdown("""
-    **Step 1:** Choose your preferred type of medical consultation  
-    **Step 2:** Upload a clear image of the affected area  
-    **Step 3:** Click the microphone button to record your symptoms  
-    **Step 4:** Click "Analyze" to get AI-powered medical insights  
-    **Step 5:** Listen to the doctor's voice response  
+    ### 📋 Flexible Input Options
     
-    ⚠️ **Note:** This is for educational purposes only. Always consult a real healthcare professional for medical advice.
+    You can provide your symptoms using **any combination** of the following:
+    
+    | Input Method | Description | Best For |
+    |--------------|-------------|----------|
+    | 📷 **Image** | Upload photo of affected area | Skin conditions, visible symptoms |
+    | 🎤 **Voice** | Record your symptoms verbally | Detailed descriptions, hands-free |
+    | ✍️ **Text** | Type your symptoms | Quick input, specific details |
+    
+    ### ✅ Minimum Requirement
+    - Provide **at least ONE** type of input (image, voice, OR text)
+    - For best results, provide **image + description** (voice or text)
+    
+    ⚠️ **Note:** This is for educational purposes only. Always consult a real healthcare professional.
     """)
 
 # Doctor Selection Section
@@ -455,20 +558,24 @@ st.markdown(f"""
 
 st.markdown("<hr>", unsafe_allow_html=True)
 
-# Two columns for inputs
-col1, col2 = st.columns(2, gap="large")
+# Input Section Header
+st.markdown("### 📝 Describe Your Symptoms")
+st.markdown("*Provide at least one type of input. More details = better diagnosis.*")
 
+# Three columns for inputs
+col1, col2, col3 = st.columns(3, gap="medium")
+
+# Column 1: Image Upload
 with col1:
     st.markdown("""
     <div class="card">
         <div class="card-header">
             <span style="font-size: 1.5rem;">📷</span>
-            <h3>Image Upload</h3>
+            <h3>Image</h3>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    # Show uploader only if no image saved
     if not st.session_state.image_saved:
         st.markdown("**Upload medical image:**")
         uploaded_image = st.file_uploader(
@@ -479,24 +586,27 @@ with col1:
         )
         
         if uploaded_image:
-            # Save image data to session state AND to file
             st.session_state.uploaded_image_data = uploaded_image.getvalue()
             with open(PATIENT_IMAGE_PATH, "wb") as f:
                 f.write(st.session_state.uploaded_image_data)
             st.session_state.image_saved = True
             st.rerun()
         else:
-            st.caption("📤 Supported formats: JPG, JPEG, PNG")
+            st.caption("📤 JPG, JPEG, PNG")
+            st.markdown("""
+            <div class="status-badge status-optional">
+                ⭕ Optional
+            </div>
+            """, unsafe_allow_html=True)
     else:
-        # Show saved image
         st.markdown("""
         <div class="status-badge status-success">
-            ✅ Image Uploaded
+            ✅ Image Ready
         </div>
         """, unsafe_allow_html=True)
-        st.image(st.session_state.uploaded_image_data, caption="Uploaded Image", use_container_width=True)
+        st.image(st.session_state.uploaded_image_data, caption="Uploaded", use_container_width=True)
         
-        if st.button("🔄 Change Image", key="change_image", use_container_width=True):
+        if st.button("🔄 Change", key="change_image", use_container_width=True):
             st.session_state.uploaded_image_data = None
             st.session_state.image_saved = False
             st.session_state.analysis_done = False
@@ -505,44 +615,49 @@ with col1:
                 os.remove(PATIENT_IMAGE_PATH)
             st.rerun()
 
+# Column 2: Voice Input
 with col2:
     st.markdown("""
     <div class="card">
         <div class="card-header">
             <span style="font-size: 1.5rem;">🎤</span>
-            <h3>Voice Input</h3>
+            <h3>Voice</h3>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
     if not st.session_state.audio_saved:
-        st.markdown("**Describe your symptoms:**")
+        st.markdown("**Record symptoms:**")
         audio_bytes = audio_recorder(
             text="",
             recording_color="#dc2626",
             neutral_color="#1e3a5f",
-            icon_size="3x",
+            icon_size="2x",
             key="audio_recorder"
         )
-        st.caption("🔴 Click to start • Click again to stop")
+        st.caption("🔴 Click to record")
         
         if audio_bytes:
-            # Save audio data to session state AND to file
             st.session_state.recorded_audio = audio_bytes
             with open(PATIENT_AUDIO_PATH, "wb") as f:
                 f.write(st.session_state.recorded_audio)
             st.session_state.audio_saved = True
             st.rerun()
-    
+        else:
+            st.markdown("""
+            <div class="status-badge status-optional">
+                ⭕ Optional
+            </div>
+            """, unsafe_allow_html=True)
     else:
         st.markdown("""
         <div class="status-badge status-success">
-            ✅ Recording Complete
+            ✅ Audio Ready
         </div>
         """, unsafe_allow_html=True)
         st.audio(st.session_state.recorded_audio, format="audio/wav")
         
-        if st.button("🔄 Record Again", key="record_again", use_container_width=True):
+        if st.button("🔄 Re-record", key="record_again", use_container_width=True):
             st.session_state.recorded_audio = None
             st.session_state.audio_saved = False
             st.session_state.analysis_done = False
@@ -551,25 +666,85 @@ with col2:
                 os.remove(PATIENT_AUDIO_PATH)
             st.rerun()
 
+# Column 3: Text Input
+with col3:
+    st.markdown("""
+    <div class="card">
+        <div class="card-header">
+            <span style="font-size: 1.5rem;">✍️</span>
+            <h3>Text</h3>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("**Type symptoms:**")
+    text_input = st.text_area(
+        "Describe your symptoms",
+        value=st.session_state.text_symptoms,
+        height=120,
+        placeholder="E.g., I have been experiencing headaches for 3 days, along with mild fever and body ache...",
+        label_visibility="collapsed",
+        key="text_symptoms_input"
+    )
+    
+    # Update session state when text changes
+    if text_input != st.session_state.text_symptoms:
+        st.session_state.text_symptoms = text_input
+        st.session_state.text_saved = bool(text_input.strip())
+        st.session_state.analysis_done = False
+        st.session_state.results = None
+    
+    if st.session_state.text_saved:
+        st.markdown("""
+        <div class="status-badge status-success">
+            ✅ Text Ready
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <div class="status-badge status-optional">
+            ⭕ Optional
+        </div>
+        """, unsafe_allow_html=True)
+
 st.markdown("<hr>", unsafe_allow_html=True)
 
 # Analysis section
 if not st.session_state.analysis_done:
-    # Check readiness
-    audio_ready = st.session_state.audio_saved
+    # Check what inputs are available
     image_ready = st.session_state.image_saved
+    audio_ready = st.session_state.audio_saved
+    text_ready = st.session_state.text_saved
     
-    col_status1, col_status2 = st.columns(2)
-    with col_status1:
+    # At least one input is required
+    any_input_ready = image_ready or audio_ready or text_ready
+    
+    # Input summary
+    st.markdown("### 📊 Input Summary")
+    
+    col_sum1, col_sum2, col_sum3 = st.columns(3)
+    
+    with col_sum1:
         if image_ready:
-            st.markdown("✅ Image uploaded")
+            st.success("✅ Image provided")
         else:
-            st.markdown("⏳ Waiting for image upload...")
-    with col_status2:
+            st.info("⭕ No image")
+    
+    with col_sum2:
         if audio_ready:
-            st.markdown("✅ Voice recording ready")
+            st.success("✅ Voice recorded")
         else:
-            st.markdown("⏳ Waiting for voice recording...")
+            st.info("⭕ No voice")
+    
+    with col_sum3:
+        if text_ready:
+            st.success("✅ Text provided")
+        else:
+            st.info("⭕ No text")
+    
+    # Warning if no input
+    if not any_input_ready:
+        st.warning("⚠️ Please provide at least **one** type of input (image, voice, or text) to get a consultation.")
     
     st.markdown("")
     
@@ -580,28 +755,57 @@ if not st.session_state.analysis_done:
         f"🔍 Get {doc_info['specialty']} Consultation", 
         type="primary", 
         use_container_width=True, 
-        disabled=not (audio_ready and image_ready)
+        disabled=not any_input_ready
     ):
-        # Get the appropriate prompt for selected doctor type
-        system_prompt = DOCTOR_PROMPTS[st.session_state.selected_doctor]["prompt"]
+        # Combine all text inputs
+        combined_symptoms = ""
+        transcription_text = ""
         
         # Processing with status updates
         with st.status(f"🔬 Consulting {doc_info['name']}...", expanded=True) as status:
-            st.write("🎤 Transcribing voice input...")
-            speech_to_text_output = transcribe_with_groq(
-                GROQ_API_KEY=GROQ_API_KEY,
-                audio_filepath=PATIENT_AUDIO_PATH,
-                stt_model="whisper-large-v3"
-            )
             
-            st.write(f"🔍 {doc_info['icon']} Analyzing from {doc_info['specialty']} perspective...")
-            encoded_image = encode_image(PATIENT_IMAGE_PATH)
-            doctor_response = analyze_image_with_query(
-                query=system_prompt + speech_to_text_output,
-                encoded_image=encoded_image,
-                model="meta-llama/llama-4-scout-17b-16e-instruct"
-            )
+            # Step 1: Transcribe audio if available
+            if audio_ready:
+                st.write("🎤 Transcribing voice input...")
+                transcription_text = transcribe_with_groq(
+                    GROQ_API_KEY=GROQ_API_KEY,
+                    audio_filepath=PATIENT_AUDIO_PATH,
+                    stt_model="whisper-large-v3"
+                )
+                combined_symptoms += f"[Voice Description]: {transcription_text} "
             
+            # Step 2: Add text input if available
+            if text_ready:
+                st.write("📝 Processing text input...")
+                combined_symptoms += f"[Written Description]: {st.session_state.text_symptoms} "
+            
+            # If no symptoms described, add default message
+            if not combined_symptoms.strip():
+                combined_symptoms = "Patient has not described specific symptoms. Please analyze the image for any visible medical conditions."
+            
+            # Step 3: Analyze with or without image
+            if image_ready:
+                st.write(f"🔍 {doc_info['icon']} Analyzing image from {doc_info['specialty']} perspective...")
+                system_prompt = doc_info["prompt_with_image"]
+                encoded_image = encode_image(PATIENT_IMAGE_PATH)
+                doctor_response = analyze_image_with_query(
+                    query=system_prompt + combined_symptoms,
+                    encoded_image=encoded_image,
+                    model="meta-llama/llama-4-scout-17b-16e-instruct"
+                )
+            else:
+                st.write(f"🔍 {doc_info['icon']} Analyzing symptoms from {doc_info['specialty']} perspective...")
+                system_prompt = doc_info["prompt_text_only"]
+                # For text-only, we need to use a different approach
+                # Using the same function but with a placeholder image or text-only model
+                # Here we'll create a simple text response using the image model with a blank/placeholder
+                doctor_response = analyze_image_with_query(
+                    query=system_prompt + combined_symptoms,
+                    encoded_image=None,  # No image
+                    model="meta-llama/llama-4-scout-17b-16e-instruct"
+                )
+            
+            # Step 4: Generate voice response
             st.write("🔊 Generating voice response...")
             text_to_speech_with_gtts(
                 input_text=doctor_response,
@@ -610,14 +814,28 @@ if not st.session_state.analysis_done:
             
             status.update(label="✅ Consultation Complete!", state="complete", expanded=False)
         
+        # Prepare display text for symptoms
+        symptoms_display = ""
+        if audio_ready and transcription_text:
+            symptoms_display += f"🎤 **Voice:** {transcription_text}\n\n"
+        if text_ready:
+            symptoms_display += f"✍️ **Text:** {st.session_state.text_symptoms}\n\n"
+        if not symptoms_display:
+            symptoms_display = "No symptoms described (image-only analysis)"
+        
         # Save results to session state
         st.session_state.results = {
-            "transcription": speech_to_text_output,
+            "transcription": transcription_text if audio_ready else "",
+            "text_input": st.session_state.text_symptoms if text_ready else "",
+            "symptoms_display": symptoms_display,
             "response": doctor_response,
             "doctor_type": st.session_state.selected_doctor,
             "doctor_name": doc_info["name"],
             "doctor_icon": doc_info["icon"],
-            "specialty": doc_info["specialty"]
+            "specialty": doc_info["specialty"],
+            "has_image": image_ready,
+            "has_audio": audio_ready,
+            "has_text": text_ready
         }
         st.session_state.analysis_done = True
         st.rerun()
@@ -628,13 +846,28 @@ if st.session_state.analysis_done and st.session_state.results:
     
     st.markdown(f"## 📋 {results['doctor_icon']} {results['specialty']} Consultation Results")
     
-    # Transcription result
+    # Input methods used badge
+    input_methods = []
+    if results.get('has_image'):
+        input_methods.append("📷 Image")
+    if results.get('has_audio'):
+        input_methods.append("🎤 Voice")
+    if results.get('has_text'):
+        input_methods.append("✍️ Text")
+    
+    st.markdown(f"**Inputs used:** {' • '.join(input_methods)}")
+    
+    # Symptoms described
     st.markdown("""
     <div class="result-section result-transcription">
         <div class="result-title">📝 Your Described Symptoms</div>
     </div>
     """, unsafe_allow_html=True)
-    st.info(results["transcription"])
+    
+    if results.get("symptoms_display"):
+        st.info(results["symptoms_display"])
+    else:
+        st.info("Image-only analysis performed")
     
     # Doctor's response with appropriate styling
     response_class = f"result-response-{results['doctor_type']}" if results['doctor_type'] != 'allopathy' else 'result-response'
@@ -686,6 +919,8 @@ with col_btn1:
         st.session_state.results = None
         st.session_state.uploaded_image_data = None
         st.session_state.image_saved = False
+        st.session_state.text_symptoms = ""
+        st.session_state.text_saved = False
         # Clean up temp files
         for filepath in [OUTPUT_AUDIO_PATH, PATIENT_AUDIO_PATH, PATIENT_IMAGE_PATH]:
             if os.path.exists(filepath):
@@ -695,27 +930,38 @@ with col_btn1:
 with col_btn2:
     if st.session_state.analysis_done and st.session_state.results:
         results = st.session_state.results
+        
+        # Build input methods string
+        input_methods_str = []
+        if results.get('has_image'):
+            input_methods_str.append("Image")
+        if results.get('has_audio'):
+            input_methods_str.append("Voice")
+        if results.get('has_text'):
+            input_methods_str.append("Text")
+        
         report_content = f"""
-{'='*50}
+{'='*60}
 AI MEDICAL CONSULTATION REPORT
-{'='*50}
+{'='*60}
 
 Consultation Type: {results['doctor_name']}
 Date: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+Input Methods: {', '.join(input_methods_str)}
 
-{'='*50}
+{'='*60}
 PATIENT'S SYMPTOMS:
-{'='*50}
-{results["transcription"]}
+{'='*60}
+{results.get("symptoms_display", "No symptoms described").replace("**", "").replace("🎤", "[Voice]").replace("✍️", "[Text]")}
 
-{'='*50}
+{'='*60}
 {results['doctor_icon']} {results['specialty'].upper()} ASSESSMENT:
-{'='*50}
+{'='*60}
 {results["response"]}
 
-{'='*50}
+{'='*60}
 DISCLAIMER:
-{'='*50}
+{'='*60}
 This AI assistant is for educational purposes only.
 The consultation was based on {results['specialty']} principles.
 Always consult a qualified healthcare professional for proper diagnosis and treatment.
@@ -731,7 +977,8 @@ Always consult a qualified healthcare professional for proper diagnosis and trea
 # Footer
 st.markdown("""
 <div class="footer">
-    <p>🏥 AI Medical Assistant v1.0 | Allopathy • Homeopathy • Ayurveda</p>
+    <p>🏥 AI Medical Assistant v2.0 | Allopathy • Homeopathy • Ayurveda</p>
+    <p>📷 Image | 🎤 Voice | ✍️ Text - Flexible Input Options</p>
     <p>© 2026 Medical AI Project | For Educational Purposes Only</p>
 </div>
 """, unsafe_allow_html=True)
