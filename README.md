@@ -26,6 +26,10 @@ An AI-powered medical consultation system that provides preliminary health asses
 
 ---
 
+## 🎬 Demo
+
+![Demo GIF](https://github.com/MohitKumarMandhre/symptom-scanner-ai/blob/main/temp_docs/ScreenRecorderFiles/20260116/demo.gif)
+
 ## ✨ Features
 
 ### Core Features
