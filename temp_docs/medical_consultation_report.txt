@@ -4,20 +4,21 @@ AI MEDICAL CONSULTATION REPORT
 ============================================================
 
 Consultation Type: Allopathic Doctor (Modern Medicine)
-Date: 2026-01-16 19:18:19
+Date: 2026-01-16 23:58:47
 Input Methods: Image, Voice
+Language: English
 
 ============================================================
 PATIENT'S SYMPTOMS:
 ============================================================
-[Voice] Voice:  I see a lot of red patches or pimples in my face. Can you diagnose this and help me understand what is wrong?
+[Voice] Voice:  I see a lot of white spots on my hair and it's slightly itchy.
 
 
 
 ============================================================
 👨‍⚕️ MODERN MEDICINE ASSESSMENT:
 ============================================================
-With what I see, I think you have acne, which appears to be moderate to severe given the presence of multiple red patches and pimples on your face. I would recommend over-the-counter or prescription medications such as benzoyl peroxide, salicylic acid, or retinoids to help control the acne, and lifestyle modifications like keeping your face clean, avoiding picking or popping pimples, and using non-comedogenic products; you should seek emergency care if you experience severe symptoms like difficulty breathing, swelling of the face or lips, or if your acne worsens; don't worry, acne is a common and treatable condition, and with proper treatment and care, you can get your skin under control and feel more confident.
+With what I see, I think you have dandruff or seborrheic dermatitis, a common skin condition that causes flakes of dead skin, leading to white spots on your hair and scalp itchiness. You can try using an over-the-counter medicated shampoo containing ingredients like zinc pyrithione or ketoconazole to help control the condition, and consider making lifestyle modifications such as washing your hair regularly, reducing stress, and avoiding harsh hair products; if the symptoms persist or worsen, you should seek medical attention, but generally, this condition is manageable and I am confident you will feel better soon.
 
 ============================================================
 DISCLAIMER:
